@@ -5,6 +5,7 @@
 
 #include "util.hpp"
 #include "gpio.hpp"
+#include "eusci.hpp"
 
 enum ClockPhase {
     CaptureOnFirst  = UCCKPH_1,
@@ -26,22 +27,8 @@ struct SpiMode {
     inline static constexpr SpiMode MODE_3() { return {CaptureOnSecond, IdleHigh}; }
 };
 
-enum BitOrder {
-    MsbFirst = UCMSB_1,
-    LsbFirst = UCMSB_0,
-};
-
-enum PacketLength {
-    _7Bit = UC7BIT__7BIT,
-    _8Bit = UC7BIT__8BIT,
-};
-
 // 4-pin SPI modes not yet implemented due to USCI50
 
-enum ClockSource {
-    Aclk  = UCSSEL__ACLK,
-    Smclk = UCSSEL__SMCLK,
-};
 
 #define SPI_A0 &UCA0CTLW0, &UCA0BRW, &UCA0STATW, &UCA0RXBUF, &UCA0TXBUF, &UCA0IE, &UCA0IFG, &UCA0IV
 #define SPI_A1 &UCA1CTLW0, &UCA1BRW, &UCA1STATW, &UCA1RXBUF, &UCA1TXBUF, &UCA1IE, &UCA1IFG, &UCA1IV
@@ -62,7 +49,7 @@ template<
 struct SpiMaster {
     /// Initialise an SPI peripheral. This function assumes that the GPIO pins for MOSI, MISO, and SCK have been correctly configured.
     static void init(
-        SpiMode mode, 
+        const SpiMode& mode, 
         ClockSource clock, 
         uint16_t prescaler, 
         BitOrder order = BitOrder::MsbFirst, 
@@ -112,7 +99,7 @@ struct SpiMaster {
     /// If the recieve buffer is longer than the send buffer then once the send buffer is exhausted dummy bytes (0x00) are sent.
     /// If the send buffer is longer than the recieve buffer then once the recieve buffer is full any further received bytes are discarded. 
     template<typename Pin>
-    static void transfer(const uint8_t sendBuf[], uint16_t sendLen, uint8_t recvBuf[], uint16_t recvLen, Pin chipSel) {
+    static void transfer(const uint8_t sendBuf[], uint16_t sendLen, uint8_t recvBuf[], uint16_t recvLen, Pin& chipSel) {
         // Determine which buffer is shorter
         uint16_t min;
         if (sendLen <= recvLen) {
@@ -147,19 +134,19 @@ struct SpiMaster {
     /// Uses a single buffer, the contents of which are replaced with the received bytes.
     /// Manages the chip select automatically.
     template<typename Pin>
-    static void transferInPlace(uint8_t buf[], uint16_t bufLen, Pin chipSel) {
+    static void transferInPlace(uint8_t buf[], uint16_t bufLen, Pin& chipSel) {
         transfer(buf, bufLen, buf, bufLen, chipSel);
     }
 
     /// Writes some number of bytes in a single SPI transaction. Manages the chip select automatically.
     template<typename Pin>
-    static void write(const uint8_t sendBuf[], uint16_t sendLen, Pin chipSel) {
+    static void write(const uint8_t sendBuf[], uint16_t sendLen, Pin& chipSel) {
         transfer(sendBuf, sendLen, sendBuf, 0, chipSel);
     }
 
     /// Reads some number of bytes in a single SPI transaction. Manages the chip select automatically.
     template<typename Pin>
-    static void read(uint8_t recvBuf[], uint16_t recvLen, Pin chipSel) {
+    static void read(uint8_t recvBuf[], uint16_t recvLen, Pin& chipSel) {
         transfer(recvBuf, 0, recvBuf, recv_len, chipSel);
     }
 };

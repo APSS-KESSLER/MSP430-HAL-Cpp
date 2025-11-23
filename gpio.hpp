@@ -6,17 +6,17 @@
 
 #include "util.hpp"
 
-enum PinFunction {
-    Gpio = 0,
-    Primary = 1,
-    Secondary = 2,
-    Tertiary = 3
+enum class PinFunction {
+    Gpio,
+    Primary,
+    Secondary,
+    Tertiary,
 };
 
-enum PullDir {
+enum class PullDir {
     Floating,
     Pulldown,
-    Pullup
+    Pullup,
 };
 
 #define P1 &P1DIR, &P1IE,   &P1IES,  &P1IFG,  &P1IN, &P1IV,   &P1OUT, &P1REN, &P1SEL0, &P1SEL1
@@ -47,19 +47,19 @@ struct Pin {
     
     static Pin function(PinFunction fn) {
         switch(fn){
-        case Gpio:
+        case PinFunction::Gpio:
             CLEAR_BITS(PxSEL0, pin);
             CLEAR_BITS(PxSEL1, pin);
             break;
-        case Primary:
+        case PinFunction::Primary:
             CLEAR_BITS(PxSEL0, pin);
             SET_BITS(PxSEL1, pin);
             break;
-        case Secondary:
+        case PinFunction::Secondary:
             SET_BITS(PxSEL0, pin);
             CLEAR_BITS(PxSEL1, pin);
             break;
-        case Tertiary:
+        case PinFunction::Tertiary:
             SET_BITS(PxSEL0, pin);
             SET_BITS(PxSEL1, pin);
             break;
@@ -67,19 +67,19 @@ struct Pin {
        return Pin<PIN_PARAMS>(); // for operator chaining
     }
     static PinFunction currentFunction() {
-    	bool primaryFn   = IS_SET(PxSEL0, pin);
-    	bool secondaryFn = IS_SET(PxSEL1, pin);
+    	const bool primaryFn   = IS_SET(PxSEL0, pin);
+    	const bool secondaryFn = IS_SET(PxSEL1, pin);
     	if (primaryFn && secondaryFn){
-    		return Tertiary;
+    		return PinFunction::Tertiary;
     	}
     	else if (primaryFn && !secondaryFn){
-    		return Secondary;
+    		return PinFunction::Secondary;
     	}
     	else if (!primaryFn && secondaryFn){
-			return Primary;
+			return PinFunction::Primary;
 		}
     	else {
-    		return Gpio;
+    		return PinFunction::Gpio;
     	}
     }
     static bool isOutput() {
@@ -140,9 +140,9 @@ struct Pin {
     }
     static Pin setPull(PullDir dir) {
         switch (dir) {
-            case Floating: floating(); break;
-            case Pulldown: pulldown(); break;
-            case Pullup:   pullup();   break;
+            case PullDir::Floating: floating(); break;
+            case PullDir::Pulldown: pulldown(); break;
+            case PullDir::Pullup:   pullup();   break;
         }
         return Pin<PIN_PARAMS>();
     }
