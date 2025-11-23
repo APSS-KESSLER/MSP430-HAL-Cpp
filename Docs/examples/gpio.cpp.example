@@ -7,6 +7,8 @@ Pin<P2,3> button; // P2.3
 Pin<P6,6> led2;   // P6.6
 
 void main() {
+    pulldownAllGpio();
+
     button.toInput()
         .pullup()
         .fallingEdgeTrigger()
@@ -17,6 +19,8 @@ void main() {
         
     led2.toOutput()
         .setLow();
+    
+    unlock_gpio();
     
     while (1);
 }

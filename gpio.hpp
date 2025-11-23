@@ -188,4 +188,25 @@ struct Pin {
     }
 };
 
+/// Enable pulldown resistors on all pins. Primarily intended to be called prior to configuration of used pins. 
+/// Unconfigured input pins are floating inputs, which massively increase power consumption due to noise causing schmitt trigger toggling.
+void pulldownAllGpio();
+
+/// Enable pullup resistors on all pins. Primarily intended to be called prior to configuration of used pins. 
+/// Unconfigured input pins are floating inputs, which massively increase power consumption due to noise causing schmitt trigger toggling.
+void pullupAllGpio();
+
+/// Puts all GPIO pins into output mode (high) on all pins. Primarily intended to be called prior to configuration of used pins. 
+/// Unconfigured input pins are floating inputs, which massively increase power consumption due to noise causing schmitt trigger toggling.
+void outputHighAllGpio();
+
+/// Puts all GPIO pins into output mode (low) on all pins. Primarily intended to be called prior to configuration of used pins. 
+/// Unconfigured input pins are floating inputs, which massively increase power consumption due to noise causing schmitt trigger toggling.
+void outputLowAllGpio();
+
+/// Disable the GPIO power-on default high-impedance mode. This synchronises the GPIO pins with the values found in the GPIO registers. 
+/// Modifications to GPIO registers do not propagate to the physical GPIO pins until this is called.
+/// Until this function is called all GPIO pins are high impedance. 
+void unlock_gpio();
+
 #endif /* GPIO_HPP */
