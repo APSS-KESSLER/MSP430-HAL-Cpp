@@ -45,7 +45,18 @@
 #include "printf_config.h"
 #endif
 
-#include <printf/printf.h>
+// The library produces a lot of (sometimes spurious) remarks from the ULP advisor. 
+// I'm just being lazy here, but some of these could probably be solved without too much hassle.
+#pragma diag_suppress 1537 // parameter passed as value
+#pragma diag_suppress 1546 // consecutive bitfield assigns
+#pragma diag_suppress 1544 // loop counting up
+#pragma diag_suppress 1530 // modulo / divide
+#pragma diag_suppress 1545 // index with int
+#pragma diag_suppress 1539 // loop check against higher bits
+#pragma diag_suppress 1531 // floats
+#pragma diag_suppress 2553 // array index with int
+
+#include "printf.h"
 
 #ifdef __cplusplus
 #include <cstdint>
@@ -481,7 +492,9 @@ static inline output_gadget_t extern_putchar_gadget(void)
 static inline printf_size_t strnlen_s_(const char* str, printf_size_t maxsize)
 {
   const char* s;
+  #pragma diag_suppress 1527 // 'empty' loop
   for (s = str; *s && maxsize--; ++s);
+  #pragma diag_default 1527
   return (printf_size_t)(s - str);
 }
 
@@ -1643,4 +1656,13 @@ int fctprintf(void (*out)(char c, void* extra_arg), void* extra_arg, const char*
   va_end(args);
   return ret;
 }
+
+#pragma diag_default 1537 // parameter passed as value
+#pragma diag_default 1546 // consecutive bitfield assigns
+#pragma diag_default 1544 // loop counting up
+#pragma diag_default 1530 // modulo / divide
+#pragma diag_default 1545 // index with int
+#pragma diag_default 1539 // loop check against higher bits
+#pragma diag_default 1531 // floats
+#pragma diag_default 2553 // array index with int
 
