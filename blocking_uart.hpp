@@ -107,16 +107,20 @@ struct Uart {
 
     /// Write `len` bytes over the UART channel.
     static void write(const uint8_t send[], uint16_t len) {
+        #pragma diag_suppress 1544 // Suppress loop counting up remark. We can't count down here. 
         for (uint16_t i = 0; i < len; i++) {
             writeByte(send[i]);
         }
+        #pragma diag_default 1544
     }
 
     /// Block until `len` bytes are received from the UART channel.
     static void read(uint8_t recv[], uint16_t len) {
+        #pragma diag_suppress 1544 // Suppress loop counting up remark. We can't count down here. 
         for (uint16_t i = 0; i < len; i++) {
             recv[i] = readByte();
         }
+        #pragma diag_default 1544
     }
 };
 

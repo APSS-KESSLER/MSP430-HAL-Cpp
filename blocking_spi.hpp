@@ -110,6 +110,7 @@ struct SpiMaster {
 
         chipSel.setLow();
 
+        #pragma diag_suppress 1544 // Suppress loop counting up remarks. We can't count down here. 
         // While the send and recieve buffers both exist, transfer
         for (uint16_t i = 0; i < min; i++) {
             recvBuf[i] = transferByte(sendBuf[i]);
@@ -125,6 +126,7 @@ struct SpiMaster {
                 writeByte(sendBuf[i]);
             }
         }
+        #pragma diag_default 1544
 
         flush();
         chipSel.setHigh();
@@ -141,13 +143,13 @@ struct SpiMaster {
     /// Writes some number of bytes in a single SPI transaction. Manages the chip select automatically.
     template<typename Pin>
     static void write(const uint8_t sendBuf[], uint16_t sendLen, Pin& chipSel) {
-        transfer(sendBuf, sendLen, sendBuf, 0, chipSel);
+        transfer(sendBuf, sendLen, nullptr, 0, chipSel);
     }
 
     /// Reads some number of bytes in a single SPI transaction. Manages the chip select automatically.
     template<typename Pin>
     static void read(uint8_t recvBuf[], uint16_t recvLen, Pin& chipSel) {
-        transfer(recvBuf, 0, recvBuf, recv_len, chipSel);
+        transfer(nullptr, 0, recvBuf, recvLen, chipSel);
     }
 };
 
