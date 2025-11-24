@@ -14,5 +14,5 @@ Anyone cloning your repo doesn't have to do anything special, unlike with a git 
 
 # Documentation
 
-This library relies on C++17 features.
+This library relies on C++14 features.
 Documentation and examples on how to use the various drivers can be found inside the Docs folder. 
