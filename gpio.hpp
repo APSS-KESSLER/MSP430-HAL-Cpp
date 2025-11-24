@@ -43,32 +43,60 @@ template<
     uint8_t pin_num
 >
 struct Pin {
-    static constexpr uint8_t pin = (1 << pin_num);
-    
+    static constexpr uint8_t pinMask = (1 << pin_num);
+    static constexpr int8_t adcChannel = calculateAdcChannel(PxOUT, pin_num);
+
+    private:
+    static constexpr int8_t calculateAdcChannel(volatile uint8_t* port, uint8_t pin_n) {
+        if (port == &P1OUT) {
+            switch (pin_n) {
+                case 0: return 0;
+                case 1: return 1;
+                case 2: return 2;
+                case 3: return 3;
+                case 4: return 4;
+                case 5: return 5;
+                case 6: return 6;
+                case 7: return 7;
+                default: return -1;
+            }
+        }
+        if (port == &P5OUT) {
+            switch (pin_n) {
+                case 0: return 8;
+                case 1: return 9;
+                case 2: return 10;
+                case 3: return 11;
+                default: return -1;
+            }
+        }
+        return -1;
+    }
+    public:
     static Pin function(PinFunction fn) {
         switch(fn){
         case PinFunction::Gpio:
-            CLEAR_BITS(PxSEL0, pin);
-            CLEAR_BITS(PxSEL1, pin);
+            CLEAR_BITS(PxSEL0, pinMask);
+            CLEAR_BITS(PxSEL1, pinMask);
             break;
         case PinFunction::Primary:
-            CLEAR_BITS(PxSEL0, pin);
-            SET_BITS(PxSEL1, pin);
+            CLEAR_BITS(PxSEL0, pinMask);
+            SET_BITS(PxSEL1, pinMask);
             break;
         case PinFunction::Secondary:
-            SET_BITS(PxSEL0, pin);
-            CLEAR_BITS(PxSEL1, pin);
+            SET_BITS(PxSEL0, pinMask);
+            CLEAR_BITS(PxSEL1, pinMask);
             break;
         case PinFunction::Tertiary:
-            SET_BITS(PxSEL0, pin);
-            SET_BITS(PxSEL1, pin);
+            SET_BITS(PxSEL0, pinMask);
+            SET_BITS(PxSEL1, pinMask);
             break;
         }
        return Pin<PIN_PARAMS>(); // for operator chaining
     }
     static PinFunction currentFunction() {
-    	const bool primaryFn   = IS_SET(PxSEL0, pin);
-    	const bool secondaryFn = IS_SET(PxSEL1, pin);
+    	const bool primaryFn   = IS_SET(PxSEL0, pinMask);
+    	const bool secondaryFn = IS_SET(PxSEL1, pinMask);
     	if (primaryFn && secondaryFn){
     		return PinFunction::Tertiary;
     	}
@@ -83,31 +111,31 @@ struct Pin {
     	}
     }
     static bool isOutput() {
-		return IS_SET(PxDIR, pin);
+		return IS_SET(PxDIR, pinMask);
 	}
     static bool isInput() {
 		return !isOutput();
 	}
     static Pin toOutput() {
-        SET_BITS(PxDIR, pin);
+        SET_BITS(PxDIR, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin toInput() {
-        CLEAR_BITS(PxDIR, pin);
+        CLEAR_BITS(PxDIR, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin toggleDirection(){
-        TOGGLE_BITS(PxDIR, pin);
+        TOGGLE_BITS(PxDIR, pinMask);
         return Pin<PIN_PARAMS>();
     }
 
     // Output pin functions
     static Pin setHigh() {
-        SET_BITS(PxOUT, pin);
+        SET_BITS(PxOUT, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin setLow() {
-        CLEAR_BITS(PxOUT, pin);
+        CLEAR_BITS(PxOUT, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin setTo(bool value) {
@@ -119,23 +147,23 @@ struct Pin {
 		return Pin<PIN_PARAMS>();
 	}
     static Pin toggle() {
-        TOGGLE_BITS(PxOUT, pin);
+        TOGGLE_BITS(PxOUT, pinMask);
         return Pin<PIN_PARAMS>();
     }
 
     // Input pin functions
     static Pin floating() {
-        CLEAR_BITS(PxREN, pin);
+        CLEAR_BITS(PxREN, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin pullup() {
-        SET_BITS(PxOUT, pin);
-        SET_BITS(PxREN, pin);
+        SET_BITS(PxOUT, pinMask);
+        SET_BITS(PxREN, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin pulldown() {
-        CLEAR_BITS(PxOUT, pin);
-        SET_BITS(PxREN, pin);
+        CLEAR_BITS(PxOUT, pinMask);
+        SET_BITS(PxREN, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin setPull(PullDir dir) {
@@ -147,7 +175,7 @@ struct Pin {
         return Pin<PIN_PARAMS>();
     }
     static bool isHigh() {
-        return IS_SET(PxIN, pin);
+        return IS_SET(PxIN, pinMask);
     }
     static bool isLow() {
         return !isHigh();
@@ -157,29 +185,29 @@ struct Pin {
 	}
     static Pin enableInterrupt() {
         static_assert(PxIE != nullptr, "Attempted to use GPIO interrupt methods on port without interrupt behaviour");
-        SET_BITS(PxIE, pin);
+        SET_BITS(PxIE, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin disableInterrupt() {
         static_assert(PxIE != nullptr, "Attempted to use GPIO interrupt methods on port without interrupt behaviour");
-        CLEAR_BITS(PxIE, pin);
+        CLEAR_BITS(PxIE, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin risingEdgeTrigger() {
         static_assert(PxIE != nullptr, "Attempted to use GPIO interrupt methods on port without interrupt behaviour");
-        CLEAR_BITS(PxIES, pin);
-        CLEAR_BITS(PxIFG, pin);
+        CLEAR_BITS(PxIES, pinMask);
+        CLEAR_BITS(PxIFG, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin fallingEdgeTrigger() {
         static_assert(PxIE != nullptr, "Attempted to use GPIO interrupt methods on port without interrupt behaviour");
-        SET_BITS(PxIES, pin);
-        CLEAR_BITS(PxIFG, pin);
+        SET_BITS(PxIES, pinMask);
+        CLEAR_BITS(PxIFG, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static Pin clearInterruptFlag() {
         static_assert(PxIE != nullptr, "Attempted to use GPIO interrupt methods on port without interrupt behaviour");
-        CLEAR_BITS(PxIFG, pin);
+        CLEAR_BITS(PxIFG, pinMask);
         return Pin<PIN_PARAMS>();
     }
     static inline uint8_t getInterruptVector() {

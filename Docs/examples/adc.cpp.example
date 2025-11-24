@@ -1,0 +1,38 @@
+#include <msp430.h>
+
+#include "hal/gpio.hpp"
+#include "hal/adc.hpp"
+#include "hal/pmm.hpp"
+
+Pin<P1,0> led;
+Pin<P1,1> input; // ADC channel A1
+Adc adc;
+
+void main() {
+    led.toOutput().setLow();
+    input.function(PinFunction::Tertiary);
+    unlock_gpio();
+
+    // MODCLK is about ~4MHz. Divide by 4 to get 1MHz ADC CLK. 1024 ADC CLK cycles -> ~1ms sampling time.
+    adc.init(AdcClockSource::ModClk, AdcPredivider::_4, AdcClockDivider::_1, AdcSampleTime::_1024);
+    uint16_t count = adc.blockingConversion(input);
+    led.setTo(count > 2048);
+
+    Vref vref = Vref::enable(VrefValue::_1V5);
+    TempSensor tsense = TempSensor::enable(vref);
+
+    while (1) {
+        uint16_t count = adc.blockingConversion(tsense);
+        int16_t temprMillivolts = adc.countToMillivolts(count, 3300); // Convert to voltage, assuming ADC vref = 3.3V.
+        // Equation 11 gives us this equation for calculating temperature from the temp sensor voltage:
+        // T = 0.00355 × (V_t – V_30C) + 30C, and V_30C = 788 mV (Table 5-10).
+        // Note integer division, so multiply first (beware overflow!), divide last to maximise accuracy
+        int16_t tempCelcius = ((355 * ((int32_t)(temprMillivolts) - 788)) + 30000) / 1000;
+
+        if (tempCelcius >= 20 && tempCelcius <= 25) {
+            led.setHigh();
+        } else {
+            led.setLow();
+        }
+    }
+}
