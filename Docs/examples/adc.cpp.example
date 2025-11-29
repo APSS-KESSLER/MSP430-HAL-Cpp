@@ -23,7 +23,7 @@ void main() {
 
     while (1) {
         uint16_t count = adc.blockingConversion(tsense);
-        int16_t temprMillivolts = adc.countToMillivolts(count, 3300); // Convert to voltage, assuming ADC vref = 3.3V.
+        uint16_t temprMillivolts = adc.countToMillivolts(count, 3300); // Convert to voltage, assuming ADC vref = 3.3V.
         // Equation 11 gives us this equation for calculating temperature from the temp sensor voltage:
         // T = 0.00355 × (V_t – V_30C) + 30C, and V_30C = 788 mV (Table 5-10).
         // Note integer division, so multiply first (beware overflow!), divide last to maximise accuracy
