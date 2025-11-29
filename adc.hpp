@@ -163,14 +163,14 @@ struct Adc {
 
     /// Convert a count into millivolts, given a reference voltage.
     /// Assumes that the resolution of the ADC has not changed since the count was measured.
-    static uint16_t countToMillivolts(uint16_t count, uint16_t refVoltage_mv) {
+    static uint16_t countToMillivolts(uint16_t count, uint16_t refVoltageMillivolts) {
         uint8_t resolutionBits;
         switch (ADCCTL2 & ADCRES) {
             case ADCRES_0: resolutionBits =  8; break;
             case ADCRES_1: resolutionBits = 10; break;
             default:       resolutionBits = 12; break;
         }
-        return uint16_t((uint32_t(count) * uint32_t(refVoltage_mv)) >> resolutionBits);
+        return uint16_t((uint32_t(count) * uint32_t(refVoltageMillivolts)) >> resolutionBits);
     }
 
     /// Enable the ADC, ready to begin conversions.
