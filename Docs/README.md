@@ -24,8 +24,17 @@ A UART driver that uses simple blocking operations for minimum complexity. Offer
 
 Common `BaudConfig` values can be found in [Table 22-5](https://www.ti.com/lit/ug/slau445i/slau445i.pdf?#%5B%7B%22num%22%3A761%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C0%2C143.1%2C0%5D) in the datasheet.
 
+## Blocking I2C
+An I2C driver that uses blocking operation for minimum complexity. The driver automatically manages sending Start, Address, and Stop signals. 
+
+`read()` and `write()` both send a Start, read or write some number of bytes to a slave at the specified address, then send a Stop.
+
+`write_read()` sends a Start, writes some number of bytes then sends a Repeated Start and reads some number of bytes, then sends a Stop. This is commonly used for reading a particular register from a slave device. 
+
+`transaction()` allows for any arbitrary number of operations in any sequence, all within one I2C transaction, a Start is sent initially and a Repeated Start is sent between any pair of unlike operations, then a Stop is sent at the end.
+
 ## Debug Print
-Pulls in an embedded-friendly implementation of `printf()` and other such functions from https://github.com/Gizzzzmo/eyalroz-printf. Notably **the function names end in an underscore** to differentiate them from the standard library functions. 
+Pulls in an embedded-friendly implementation of `printf()` and other such functions from https://github.com/Gizzzzmo/eyalroz-printf. Notably **the function names end with an underscore** to differentiate them from the standard library functions. 
 
 This implementation depends on you providing an implementation of `void putchar_(char c)` which should write a single byte to your serial device. 
 Usually this serial device is one of the MSP's onboard UART peripherals (used in combination with a UART to USB adapter plugged into a computer), but there's nothing stopping you from using this for SPI or something else.
