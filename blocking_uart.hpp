@@ -67,7 +67,7 @@ struct Uart {
         const BaudConfig& baud,
         ParityBit parity,
         StopBits nStopBits = StopBits::OneStop,
-        BitOrder order = BitOrder::MsbFirst, 
+        BitOrder order = BitOrder::LsbFirst,
         PacketLength length = PacketLength::_8Bit) {
         
         SET_BITS(CTLW0, UCSWRST);
