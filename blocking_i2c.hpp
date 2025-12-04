@@ -50,7 +50,7 @@ struct I2cMaster {
     private:
     /// Listen for errors. For an I2C single master this is really just if we receive a NACK.
     static bool err_occurred() {
-        if (IS_SET(IFG, UCTXNACK)) {
+        if (IS_SET(IFG, UCNACKIFG)) {
             // Send stop and wait for it to finish
             SET_BITS(CTLW0, UCTXSTP_1);
             while(IS_SET(CTLW0, UCTXSTP));
@@ -146,7 +146,7 @@ struct I2cMaster {
         // Clear old flags, set slave address and Rx mode
         *IFG = 0;
         *SA = address;
-        SET_BITS(CTLW0, UCTR__RX);
+        CLEAR_BITS(CTLW0, UCTR);
 
         if (sendStart) {
             SET_BITS(CTLW0, UCTXSTT_1);

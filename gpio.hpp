@@ -80,12 +80,12 @@ struct Pin {
             CLEAR_BITS(PxSEL1, pinMask);
             break;
         case PinFunction::Primary:
-            CLEAR_BITS(PxSEL0, pinMask);
-            SET_BITS(PxSEL1, pinMask);
-            break;
-        case PinFunction::Secondary:
             SET_BITS(PxSEL0, pinMask);
             CLEAR_BITS(PxSEL1, pinMask);
+            break;
+        case PinFunction::Secondary:
+            CLEAR_BITS(PxSEL0, pinMask);
+            SET_BITS(PxSEL1, pinMask);
             break;
         case PinFunction::Tertiary:
             SET_BITS(PxSEL0, pinMask);
