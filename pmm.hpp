@@ -2,6 +2,7 @@
 #define PMM_HPP
 
 #include <msp430.h>
+#include <stdint.h>
 
 /// List of possible values that the internal voltage reference can take on.
 enum class VrefValue {

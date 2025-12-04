@@ -1,8 +1,8 @@
 #ifndef GPIO_HPP
 #define GPIO_HPP
 
-#include <stdint.h>
 #include <msp430.h>
+#include <stdint.h>
 
 #include "util.hpp"
 

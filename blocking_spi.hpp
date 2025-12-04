@@ -2,6 +2,7 @@
 #define BLOCKING_SPI_HPP
 
 #include <msp430.h>
+#include <stdint.h>
 
 #include "util.hpp"
 #include "gpio.hpp"

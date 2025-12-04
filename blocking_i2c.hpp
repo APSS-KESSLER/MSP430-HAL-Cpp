@@ -6,9 +6,6 @@
 
 #include "util.hpp"
 
-#define I2C_B0 &UCB0CTLW0, &UCB0CTLW1, &UCB0BRW, &UCB0STATW, &UCB0RXBUF, &UCB0TXBUF, &UCB0I2CSA, &UCB0IE, &UCB0IFG, &UCB0IV
-#define I2C_B1 &UCB1CTLW0, &UCB1CTLW1, &UCB1BRW, &UCB1STATW, &UCB1RXBUF, &UCB1TXBUF, &UCB1I2CSA, &UCB1IE, &UCB1IFG, &UCB1IV
-
 enum class I2cClockSource {
     ExternalUClki = UCSSEL__UCLKI,
     Smclk = UCSSEL__SMCLK,
@@ -32,6 +29,9 @@ struct I2cOperation {
     uint8_t* data;
     uint16_t len;
 };
+
+#define I2C_B0 &UCB0CTLW0, &UCB0CTLW1, &UCB0BRW, &UCB0STATW, &UCB0RXBUF, &UCB0TXBUF, &UCB0I2CSA, &UCB0IE, &UCB0IFG, &UCB0IV
+#define I2C_B1 &UCB1CTLW0, &UCB1CTLW1, &UCB1BRW, &UCB1STATW, &UCB1RXBUF, &UCB1TXBUF, &UCB1I2CSA, &UCB1IE, &UCB1IFG, &UCB1IV
 
 // Unfortunately the register offsets are different between USCIA and USCIB, so we can't just take the base address and add offsets.
 template<

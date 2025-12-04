@@ -2,6 +2,7 @@
 #define BLOCKING_UART_HPP
 
 #include <msp430.h>
+#include <stdint.h>
 
 #include "util.hpp"
 #include "gpio.hpp"
