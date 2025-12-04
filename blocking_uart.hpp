@@ -23,6 +23,16 @@ struct BaudConfig {
     uint8_t  ucbrs;
     uint8_t  ucbrf;
     bool ucos16;
+
+    /// Returns a BaudConfig for 9600 baud when SMCLK at the default speed (1.048576 MHz)
+    static BaudConfig defaultSmclk9600Baud() {
+        return {ucos16: true, ucbr: 6, ucbrf: 13, ucbrs: 0x22};
+    }
+
+    /// Returns a BaudConfig for 115200 baud when SMCLK at the default speed (1.048576 MHz)
+    static BaudConfig defaultSmclk115200Baud() {
+        return {ucos16: false, ucbr: 9, ucbrf: 0, ucbrs: 0x08};
+    }
 };
 
 
