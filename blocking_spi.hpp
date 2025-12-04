@@ -47,6 +47,16 @@ template<
     volatile uint16_t* IV
 >
 struct SpiMaster {
+    private:
+    static bool txBufFull() {
+        return !IS_SET(IFG, UCTXIFG);
+    }
+
+    static bool rxBufEmpty() {
+        return !IS_SET(IFG, UCRXIFG);
+    }
+
+    public:
     /// Initialise an SPI peripheral. This function assumes that the GPIO pins for MOSI, MISO, and SCK have been correctly configured.
     static void init(
         const SpiMode& mode, 
@@ -62,14 +72,6 @@ struct SpiMaster {
         *BRW0 = prescaler;
 
         CLEAR_BITS(CTLW0, UCSWRST);
-    }
-
-    static bool txBufFull() {
-        return (*IFG & UCTXIFG) == 0;
-    }
-
-    static bool rxBufEmpty() {
-        return (*IFG & UCRXIFG) == 0;
     }
 
     /// Send and recieve a single byte. Does not manage the chip select pin.
