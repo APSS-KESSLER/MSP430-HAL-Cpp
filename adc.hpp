@@ -2,6 +2,7 @@
 #define CLOCK_HPP
 
 #include <msp430.h>
+#include "pmm.hpp"
 
 /// How much to divide the input clock
 enum class AdcPredivider {
@@ -91,9 +92,59 @@ enum class AdcPowerMode {
     LowPower  = ADCSR,
 };
 
+// Internal implementation details
+namespace detail {
+    struct Vss {
+        static constexpr int8_t adcChannel = 14;
+    };
+    struct Vcc {
+        static constexpr int8_t adcChannel = 15;
+    };
+
+    // Boilerplate used by isAdcChannelType() to determine template types
+    // Mark all types as not an ADC channel...
+    template<typename>
+    struct IsAdcChannel : std::false_type {};
+
+    // ...except if they're a Pin<...> type...
+    template< 
+        volatile uint8_t*  PxDIR, 
+        volatile uint8_t*  PxIE,
+        volatile uint8_t*  PxIES,
+        volatile uint8_t*  PxIFG,
+        volatile uint8_t*  PxIN,
+        volatile uint16_t* PxIV,
+        volatile uint8_t*  PxOUT, 
+        volatile uint8_t*  PxREN, 
+        volatile uint8_t*  PxSEL0, 
+        volatile uint8_t*  PxSEL1, 
+        uint8_t pin_num
+    >
+    struct IsAdcChannel<Pin<PIN_PARAMS>> : std::true_type {};
+
+    // ...or are one of the non-GPIO channels
+    struct IsAdcChannel<const Vss>  : std::true_type {};
+    struct IsAdcChannel<const Vcc>  : std::true_type {};
+    struct IsAdcChannel<Vref> : std::true_type {};
+    struct IsAdcChannel<TempSensor> : std::true_type {};
+}
+
+namespace AdcChannel {
+    /// Struct representing the 14th ADC channel (VSS). Pass this to the ADC if you want to read channel 14.
+    constexpr detail::Vss VSS;
+
+    /// Struct representing the 15th ADC channel (VCC). Pass this to the ADC if you want to read channel 15.
+    constexpr detail::Vcc VCC;
+}
+
 // TODO: Support other voltage references besides VCC
 struct Adc {
     private:
+    /// Determines if a template parameter T is a valid ADC channel or not.
+    template<typename T>
+    static constexpr bool isAdcChannelType() {
+        return detail::IsAdcChannel<T>::value;
+    }
     static void setChannel(uint8_t channel) {
         ADCMCTL0 = (ADCMCTL0 & ~ADCINCH) | (channel & ADCINCH);
     }
@@ -132,13 +183,14 @@ struct Adc {
     template<typename Pin>
     static uint16_t blockingConversion(Pin& adcPin) {
         startConversion(adcPin);
-        while(adcIsBusy());
+        while(isBusy());
         return getConversionResult();
     }
 
     /// Begin an ADC conversion and immediately return without waiting for it to complete.
     template<typename Pin>
     static void startConversion(Pin& adcPin) {
+        static_assert(isAdcChannelType<Pin>(), "The type of adcPin must be one of 'Pin<...>', 'Vref', 'TempSensor', 'Vcc', or 'Vss'.");
         static_assert(adcPin.adcChannel >= 0, "Attempted to read from pin not connected to ADC");
         disable();
         setChannel(adcPin.adcChannel);
@@ -147,13 +199,13 @@ struct Adc {
     }
 
     /// Returns true while the ADC is still converting. Returns false when the ADC result is ready to read. The inverse of adcResultReady().
-    static bool adcIsBusy() {
+    static bool isBusy() {
         return ADCCTL1 & ADCBUSY;
     }
 
     /// Returns true when the ADC conversion is ready. The inverse of adcIsBusy().
-    static bool adcResultReady() {
-        return !adcIsBusy();
+    static bool resultReady() {
+        return !isBusy();
     }
 
     /// Get the result

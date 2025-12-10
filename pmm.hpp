@@ -21,7 +21,7 @@ struct Vref {
 
     /// Enable the internal voltage reference.
     /// Returns a token that proves the voltage reference is active. Can be passed to the ADC for reading.
-    static Vref enable(VrefValue vref) {
+    static const Vref enable(VrefValue vref) {
         uint8_t refvsel = static_cast<uint16_t>(vref);
 
         PMMCTL2 = (PMMCTL2 & ~REFVSEL) | refvsel | INTREFEN_1;
@@ -39,29 +39,10 @@ struct TempSensor {
 
     /// Enable the internal temperature sensor. Requires the internal voltage reference to be enabled already.
     /// Returns a token that proves the temp sensor is active. Can be passed to the ADC for reading.
-    static TempSensor enable(Vref& Vref) {
+    static const TempSensor enable(Vref& Vref) {
         PMMCTL2 |= TSENSOREN_1;
         return TempSensor {};
     }
 };
-
-namespace {
-    struct Vcc {
-        static constexpr int8_t adcChannel = 15;
-    };
-
-    struct Vss {
-        static constexpr int8_t adcChannel = 14;
-    };
-}
-
-
-namespace Pmm {
-    /// Struct representing the 15th ADC channel (VCC). Pass this to the ADC if you want to read channel 15.
-    Vcc VCC;
-
-    /// Struct representing the 14th ADC channel (VSS). Pass this to the ADC if you want to read channel 14.
-    Vss VSS;
-}
 
 #endif
