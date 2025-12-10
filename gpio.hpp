@@ -3,6 +3,7 @@
 
 #include <msp430.h>
 #include <stdint.h>
+#include <type_traits>
 
 #include "util.hpp"
 
@@ -236,5 +237,36 @@ void gpioOutputLowAll();
 /// Modifications to GPIO registers do not propagate to the physical GPIO pins until this is called.
 /// Until this function is called all GPIO pins are high impedance. 
 void gpioUnlock();
+
+namespace detail {
+    // Used by the isPinType function below.
+    // Mark all types as not a 'Pin'...
+    template<typename>
+    struct IsPin : std::false_type {};
+
+    // ...except if they're a Pin<...> type
+    template< 
+        volatile uint8_t*  PxDIR, 
+        volatile uint8_t*  PxIE,
+        volatile uint8_t*  PxIES,
+        volatile uint8_t*  PxIFG,
+        volatile uint8_t*  PxIN,
+        volatile uint16_t* PxIV,
+        volatile uint8_t*  PxOUT, 
+        volatile uint8_t*  PxREN, 
+        volatile uint8_t*  PxSEL0, 
+        volatile uint8_t*  PxSEL1, 
+        uint8_t pin_num
+    >
+    struct IsPin<Pin<PIN_PARAMS>> : std::true_type {};
+}
+
+namespace Gpio {
+    /// Determines if a template parameter T is of type Pin<...> or not.
+    template<typename T>
+    constexpr bool isPinType() {
+        return detail::IsPin<T>::value;
+    }
+}
 
 #endif /* GPIO_HPP */

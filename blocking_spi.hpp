@@ -103,6 +103,7 @@ struct SpiMaster {
     /// If the send buffer is longer than the recieve buffer then once the recieve buffer is full any further received bytes are discarded. 
     template<typename Pin>
     static void transfer(const uint8_t sendBuf[], uint16_t sendLen, uint8_t recvBuf[], uint16_t recvLen, Pin& chipSel) {
+        static_assert(Gpio::isPinType<Pin>(), "chipSel must be of type Pin<...>");
         // Determine which buffer is shorter
         uint16_t min;
         if (sendLen <= recvLen) {
