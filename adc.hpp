@@ -92,6 +92,29 @@ enum class AdcPowerMode {
     LowPower  = ADCSR,
 };
 
+// The following two enums collectively set ADCSREF, so the macro values don't quite line up how you might initially expect,
+// but they should work. AdcPosRef sets the bottom two bits, AdcNegRef sets the top bit.
+
+/// List of positive ADC reference values. This controls what voltage corresponds to a maximum count (which varies based on the ADC resolution mode).
+enum class AdcPosRef {
+    /// AVCC, i.e. External MSP430 supply voltage.
+    Vcc = ADCSREF_0,
+    /// Internal reference voltage Vref. Vref must be configured before use.
+    Vref = ADCSREF_1,
+    /// External reference voltage VEref+. VEref+ GPIO pin must be configured before use.
+    VErefPlus = ADCSREF_3,
+    /// External reference voltage VEref+, buffered using internal ADC buffer. VEref+ GPIO pin must be configured before use.
+    VErefPlusBuf = ADCSREF_2,
+};
+
+/// List of negative ADC reference values. This controls what voltage corresponds to a count of 0.
+enum class AdcNegRef {
+    /// AVSS, i.e. GND
+    Vss = ADCSREF_0,
+    /// External reference voltage VEref-. VEref- GPIO pin must be configured before use.
+    VErefMinus = ADCSREF_4,
+};
+
 // Internal implementation details
 namespace detail {
     struct Vss {
@@ -137,7 +160,6 @@ namespace AdcChannel {
     constexpr detail::Vcc VCC;
 }
 
-// TODO: Support other voltage references besides VCC
 struct Adc {
     private:
     /// Determines if a template parameter T is a valid ADC channel or not.
@@ -159,6 +181,8 @@ struct Adc {
         AdcPredivider predivider, 
         AdcClockDivider divider, 
         AdcSampleTime sampleTime, 
+        AdcPosRef positiveRef = AdcPosRef::Vcc,
+        AdcNegRef negativeRef = AdcNegRef::Vss,
         AdcResolution resolution = AdcResolution::_12Bit, 
         AdcPowerMode powerMode = AdcPowerMode::HighSpeed ) {
 
@@ -168,6 +192,11 @@ struct Adc {
         uint16_t clkSrc = static_cast<uint16_t>(clockSource);
         uint16_t res    = static_cast<uint16_t>(resolution);
         uint16_t adcsr  = static_cast<uint16_t>(powerMode);
+        uint16_t posRef = static_cast<uint16_t>(positiveRef);
+        uint16_t negRef = static_cast<uint16_t>(negativeRef);
+
+        // Clear ADCENC prior to configuration
+        disable();
 
         //        Sample time  | Multi-sample off
         ADCCTL0 =     time     | ADCMSC_0;
@@ -177,6 +206,9 @@ struct Adc {
 
         //        Clock predivider | ADC Resolution | Unsigned result | Max sampling rate
         ADCCTL2 =      prediv      |       res      |     ADCDF_0     | adcsr;
+
+        // ADC positive and negative reference voltages
+        ADCMCTL0 = posRef | negRef;
     }
 
     /// Begin an ADC conversion and wait for it to finish, returning the result.
