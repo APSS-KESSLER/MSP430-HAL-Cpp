@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+
+*/Debug/
+*/Release/
+*/.xdchelp
+*/.config/
+*/.launches/

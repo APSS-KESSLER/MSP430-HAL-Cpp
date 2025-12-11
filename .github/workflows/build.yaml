@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.4
+      - name: Build with Code Composer Studio
+        uses: maus007/docker-run-action-fork@v1
+        with:
+          image: rossphorus/ccstudio-12-msp430:latest
+          options: -v ${{ github.workspace }}:/work
+          run: |
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectImport -ccs.location "/work/.test/test_positive_case"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_positive_case" -ccs.configuration "Debug"
+
