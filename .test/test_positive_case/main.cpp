@@ -70,7 +70,7 @@ void testAdc() {
     // adc.blockingConversion(pin);
 }
 
-void test_pmm() {
+void testPmm() {
     Vref vref = Vref::enable(VrefValue::_2V5);
     TempSensor tsense = TempSensor::enable(vref);
 
@@ -88,7 +88,8 @@ int main(void) {
     testSpi();
     testUart();
     testAdc();
-
+    testPmm();
+    
     gpioPulldownAll();
 
     led.toOutput();
