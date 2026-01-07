@@ -6,6 +6,19 @@ To avoid memory allocations, objects are designed to be used in a static manner.
 Instead, all methods are declared as static, and object parameters (usually registers) are passed as template arguments. 
 As a result these 'objects' have zero runtime overhead compared to standard function calls, but can't have any mutable state. This isn't such a big deal, since the state of a peripheral is typically represented by the state of the hardware registers anyway.
 
+## ... I don't know C++, what does that mean?
+
+That's fine! The takeaway is that peripherals are declared like global variables, and you can call functions on them by using the dot syntax:
+```C++
+Pin<P1,0> led; // P1.0
+
+void main() {
+    // Set P1.0 as an output pin and set it high
+    led.toOutput();
+    led.setHigh();
+}
+```
+That's about all you need to know!
 # Drivers
 
 ## GPIO
@@ -61,7 +74,7 @@ This is a good place to put the definitions of the various objects and allows th
 
 ## Unversioned Project
 In the case where dealing with versioning is unimportant, a single header file can contain the pin mappings:
-```C
+```C++
 // pcb_mappings.hpp
 #include "gpio.hpp"
 Pin<P2,1> redLEDPin;    // P2.1
@@ -74,7 +87,7 @@ Then elsewhere in your program you can simply refer to `redLEDPin` without worry
 If you expect you might have several versions of your PCB you may wish to keep your code compatible with multiple versions (where feasible).
 This can be achieved by having one mapping file per PCB revision, then using an unversioned header file (e.g. `pcb_mappings.hpp` in the example below) that all other files in the project include, which simply includes your chosen version. This allows you to swap between versions by changing a single include statement.
 
-```C
+```C++
 // pcb_mappings_v1.hpp
 #include "gpio.hpp"
 Pin<P2,1> redLEDPin;    // P2.1
@@ -82,7 +95,7 @@ Pin<P2,2> yellowLEDPin; // P2.2
 Pin<P2,3> greenLEDPin;  // P2.3
 ```
 
-```C
+```C++
 // pcb_mappings_v2.hpp
 #include "gpio.hpp"
 Pin<P3,4> redLEDPin;    // P3.4
@@ -90,7 +103,7 @@ Pin<P3,5> yellowLEDPin; // P3.5
 Pin<P3,6> greenLEDPin;  // P3.6
 ```
 
-```C
+```C++
 // pcb_mappings.hpp
 #include "pcb_mappings_v2.hpp"
 ```
