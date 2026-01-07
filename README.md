@@ -10,6 +10,6 @@ Any files that include these HAL files should have `.cpp` and `.hpp` extensions 
 
 # Documentation
 
-Documentation and examples on how to use the various drivers can be found inside the Docs folder. 
+Examples and documentation on how to use the various drivers can be found inside the `examples/` folder. 
 
-The example programs in the Docs folder assume that this library is placed in a subfolder called `hal/`.
+The example programs assume that the library is placed in a subfolder called `hal/`.
