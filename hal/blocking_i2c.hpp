@@ -77,6 +77,9 @@ struct I2cMaster {
         return -1;
     }
 
+    /// Write some number of bytes to the slave. 
+    /// Returns -1 if OK, otherwise returns the byte where a NACK was received.
+    /// (i.e. 0 = slave address byte, 1 = first data byte, etc.)
     static int16_t writeBytes(uint8_t address, uint8_t buf[], uint16_t len, bool sendStart, bool sendStop) {
         // Clear old flags, set slave address and Tx mode
         *IFG = 0;

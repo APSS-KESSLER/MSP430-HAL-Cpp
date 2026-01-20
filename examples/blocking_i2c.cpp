@@ -34,7 +34,7 @@ void main() {
     // Read 3 bytes from the device at 0x3F.
     // | S | 0x3F+R | A | ->buf[0] | A | ->buf[1] | A | ->buf[2] | N | P |
     uint8_t buf[3];
-    i2c.write(slaveAddress, buf, 3);
+    i2c.read(slaveAddress, buf, 3);
 
     // write_read() writes and then reads, commonly used for reading from a particular register on the slave.
     // Write 1 byte to the device at 0x3F, then send a repeated start and read 3 bytes (all within one I2C transaction).
