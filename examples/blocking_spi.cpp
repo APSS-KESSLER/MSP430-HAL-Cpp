@@ -45,7 +45,7 @@ void main() {
     // CS:   ‾‾‾‾|_______________________________|‾‾‾‾
     // MOSI:        |     1      |     2      |       
     // MISO:        | recvBuf[0] | recvBuf[1] |       
-    #define BUF_LEN = 2; // If you know C++ you could use a constexpr for this
+    #define BUF_LEN 2 // If you know C++ you could use a constexpr for this
     uint8_t sendBuf[BUF_LEN] = {1, 2};
     uint8_t recvBuf[BUF_LEN];
     spi.transfer(sendBuf, BUF_LEN, recvBuf, BUF_LEN, cs);
