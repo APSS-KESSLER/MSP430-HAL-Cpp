@@ -2,6 +2,7 @@
 
 #include "hal/gpio.hpp"
 #include "hal/blocking_spi.hpp"
+#include "hal/watchdog.hpp"
 
 // Acts as an SPI master, sending two SPI transactions and then does nothing. See below for details.
 
@@ -10,8 +11,11 @@ Pin<P1,6> miso;
 Pin<P1,5> sclk;
 Pin<P1,4> cs;
 SpiMaster<SPI_A0> spi;
+Watchdog watchdog;
 
 void main() {
+    watchdog.disable();
+    
     // Configure GPIO for SPI mode
     mosi.function(PinFunction::Primary);
     miso.function(PinFunction::Primary);

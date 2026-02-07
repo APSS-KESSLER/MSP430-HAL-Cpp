@@ -3,6 +3,7 @@
 #include "hal/gpio.hpp"
 #include "hal/blocking_uart.hpp"
 #include "hal/debug_serial.hpp"
+#include "hal/watchdog.hpp"
 
 // Repeatedly prints "Hello, world n!" once per second (starting from n=0), over eUSCI_A0 (P1.7, P1.6) at a baud rate of 9600.
 
@@ -10,6 +11,7 @@
 Pin<P1,7> tx;
 Pin<P1,6> rx;
 Uart<UART_A0> uart;
+Watchdog watchdog;
 
 // The print functions internally call putchar_(), which is responsible for printing a single byte, 
 // so we must implement it. In our case we 'print' it by sending it over UART.
@@ -18,6 +20,8 @@ void putchar_(char c) {
 }
 
 void main() {
+    watchdog.disable();
+    
     // Configure GPIO for UART mode. This allows the UART peripheral to control them.
     tx.function(PinFunction::Primary);
     rx.function(PinFunction::Primary);

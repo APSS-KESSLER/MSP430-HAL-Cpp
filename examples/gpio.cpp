@@ -1,6 +1,7 @@
 #include <msp430.h>
 
 #include "hal/gpio.hpp"
+#include "hal/watchdog.hpp"
 
 // Whenever the button on P2.3 is pressed the state of the P1.0 LED toggles, and P6.6 is set high.
 // Note that due to a lack of debouncing, pressing the button may trigger the interrupt code several times.
@@ -9,8 +10,11 @@
 Pin<P1,0> led1;   // P1.0
 Pin<P2,3> button; // P2.3
 Pin<P6,6> led2;   // P6.6
+Watchdog watchdog;
 
 void main() {
+    watchdog.disable();
+    
     // All GPIO are floating inputs by default. Enabling pullup or
     // pulldown resistors on unused pins greatly reduces power consumption.
     gpioPulldownAll();

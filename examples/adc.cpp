@@ -3,6 +3,7 @@
 #include "hal/gpio.hpp"
 #include "hal/adc.hpp"
 #include "hal/pmm.hpp"
+#include "hal/watchdog.hpp"
 
 // Sample P1.1, if the value is more than half the reference voltage set the P1.0 LED on.
 // Then repeatedly sample the onboard temperature sensor, turning the P6.6 LED on if the 
@@ -12,8 +13,11 @@ Pin<P1,0> led1;
 Pin<P6,6> led2;
 Pin<P1,1> input; // ADC channel A1
 Adc adc;
+Watchdog watchdog;
 
 void main() {
+    watchdog.disable();
+    
     led1.toOutput().setLow();
     led2.toOutput().setLow();
     input.function(PinFunction::Tertiary);

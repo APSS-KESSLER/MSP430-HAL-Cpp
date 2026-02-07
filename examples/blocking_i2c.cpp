@@ -2,7 +2,7 @@
 
 #include "hal/gpio.hpp"
 #include "hal/blocking_i2c.hpp"
-
+#include "hal/watchdog.hpp"
 // Acts as an I2C master, sends various messages to 0x3F. See below for details.
 
 // Diagrams of I2C messages are shown by each message for reference. The symbols below are used:
@@ -11,8 +11,11 @@
 Pin<P1,3> scl;
 Pin<P1,2> sda;
 I2cMaster<I2C_B0> i2c;
+Watchdog watchdog;
 
 void main() {
+    watchdog.disable();
+    
     // Configure GPIO for I2C mode
     scl.function(PinFunction::Primary);
     sda.function(PinFunction::Primary);

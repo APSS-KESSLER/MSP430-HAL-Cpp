@@ -2,14 +2,18 @@
 
 #include "hal/gpio.hpp"
 #include "hal/blocking_uart.hpp"
+#include "hal/watchdog.hpp"
 
 // Writes "Hello" once per second over eUSCI_A0 (P1.7, P1.6) at a baud rate of 9600
 
 Pin<P1,7> tx;
 Pin<P1,6> rx;
 Uart<UART_A0> uart;
+Watchdog watchdog;
 
 void main() {
+    watchdog.disable();
+    
     // Configure GPIO for UART mode
     tx.function(PinFunction::Primary);
     rx.function(PinFunction::Primary);
