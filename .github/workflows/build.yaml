@@ -26,3 +26,4 @@ jobs:
             eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_blocking_uart"
             eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_debug_serial"
             eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_gpio"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_watchdog"
