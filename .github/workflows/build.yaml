@@ -18,6 +18,11 @@ jobs:
           image: rossphorus/ccstudio-12-msp430:latest
           options: -v ${{ github.workspace }}:/work
           run: |
-            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectImport -ccs.location "/work/.test/test_positive_case"
-            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_positive_case" -ccs.configuration "Debug"
-
+            set -e
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectImport -ccs.location "/work/.test/test_examples"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_adc"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_blocking_i2c"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_blocking_spi"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_blocking_uart"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_debug_serial"
+            eclipse -noSplash -data /tmp/workspace -application com.ti.ccstudio.apps.projectBuild -ccs.projects "test_examples" -ccs.configuration "example_gpio"

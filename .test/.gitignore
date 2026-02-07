@@ -39,9 +39,15 @@
 
 # debug information files
 *.dwo
+*/.clangd
 
 */Debug/
 */Release/
 */.xdchelp
 */.config/
 */.launches/
+*/targetConfigs/
+*/.settings/
+
+# test_examples build configurations
+test_examples/example_*/

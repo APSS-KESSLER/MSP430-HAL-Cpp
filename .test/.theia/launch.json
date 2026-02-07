@@ -2,21 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "test_positive_case",
+            "name": "test_examples",
             "type": "ccs-debug",
             "request": "launch",
             "projectInfo": {
-                "name": "test_positive_case",
-                "resourceId": "/test_positive_case/__ccs_3_compilerIncludes"
-            }
-        },
-        {
-            "name": "test_positive_case (1)",
-            "type": "ccs-debug",
-            "request": "launch",
-            "projectInfo": {
-                "name": "test_positive_case",
-                "resourceId": "/test_positive_case"
+                "name": "test_examples",
+                "resourceId": "/test_examples"
             },
             "connections": [
                 {
